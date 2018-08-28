@@ -10,28 +10,28 @@ int main(){
   srand(time(nullptr));
   int i;
   int j;
-  int lines=1000;
-  int columns=1000;
-  ifstream ifs;
-  ifs.open ("waterfall_grey_1920_2520.raw", std::ifstream::in);
+  int lines=7;
+  int columns=7;
+  //ifstream ifs;
+  //ifs.open ("waterfall_grey_1920_2520.raw", std::ifstream::in);
   int matrix[lines][columns];
   char c = ifs.get();
 
-  while (ifs.good()) {
+  //while (ifs.good()) {
     //cout << (unsigned int)c << " ";;
-    for (i = 0; i < lines; i++)
+    for (i = 1; i < lines-1; i++)
     {
-      for (j = 0; j < columns; j++)
+      for (j = 1; j < columns-1; j++)
       {
         matrix[i][j]= rand() % 255;
-        c = ifs.get();
+       // c = ifs.get();
       }
       cout << "i = " << i << endl;
     }
-    break;
+    //break;
     //c = ifs.get();
    // i++;
-  }
+  //}
 
   for (i = 0; i < lines; i++)
   {
@@ -43,8 +43,35 @@ int main(){
     cout << endl;
   }
   cout << endl;
-  //cout << "i = " << i << endl;
-  ifs.close();
+
+  
+//arxh loop
+//stelnoyme grammes sthles klp...
+
+
+
+
+//lamvabnoyme
+
+
+
+//eswterikh epe3ergasia 2-> (lines-2) kai (2-> columns-2)
+
+
+
+
+//wait() gia receives
+//epe3ergasia
+
+
+
+
+//wait() gia sents
+
+//loop kai antistrofh pinakwn
+
+
+
   return 0;
 }
 
