@@ -101,16 +101,15 @@ void main(int argc, char *argv[])
              nbrs[DOWNRIGHT]);
 
       // exchange data (rank) with 4 neighbors
-      for (i=0; i<8; i++) {
-         dest = nbrs[i];
-         source = nbrs[i];
-         MPI_Isend(&outbuf, 1, MPI_INT, dest, tag, 
-                   MPI_COMM_WORLD, &reqs[i]);
-         MPI_Irecv(&inbuf[i], 1, MPI_INT, source, tag, 
-                   MPI_COMM_WORLD, &reqs[i+8]);
-         }
-
+      for (i=0; i<8; i++) 
+      {
+        dest = nbrs[i];
+        source = nbrs[i];
+        MPI_Isend(&outbuf, 1, MPI_INT, dest, tag, MPI_COMM_WORLD, &reqs[i]);
+        MPI_Irecv(&inbuf[i], 1, MPI_INT, source, tag, MPI_COMM_WORLD, &reqs[i+8]);
+      }
       MPI_Waitall(16, reqs, stats);
+     
    
       printf("rank= %d                  inbuf(u,d,l,r)= %d %d %d %d\n",
              rank,inbuf[UP],inbuf[DOWN],inbuf[LEFT],inbuf[RIGHT]);
@@ -122,7 +121,7 @@ void main(int argc, char *argv[])
       {
         matrix[i]=malloc((numOfPro+2)*sizeof(int));
       }
-      printf("###AAAAAAAA######\n" );
+      //printf("###AAAAAAAA######\n" );
       for (i = 0; i < numOfPro+2; i++)
       {
         for (j = 0; j < numOfPro+2; j++)
@@ -136,9 +135,74 @@ void main(int argc, char *argv[])
           }
         }
       }
-      printf("###bbbbbbbbbbbb######\n" );
+
+//------------------------------------------------------------------------------------------------//    
+      int upLeftNum=matrix[1][1];
+      int upRightNum=matrix[1][numOfPro];
+      int downLeftNum=matrix[numOfPro][1];
+      int downRightNum=matrix[numOfPro][numOfPro];
+
+      int* upMatrix=malloc((numOfPro)*sizeof(int));
+      for (i = 1; i < numOfPro+1; ++i)
+      {
+        upMatrix[i-1]= matrix[1][i];
+      }
+
+      int* downMatrix=malloc((numOfPro)*sizeof(int));
+      for (i = 1; i < numOfPro+1; ++i)
+      {
+        downMatrix[i-1]= matrix[numOfPro][i];
+      }
+
+      int* leftMatrix=malloc((numOfPro)*sizeof(int));
+      for (i = 1; i < numOfPro+1; ++i)
+      {
+        leftMatrix[i-1]= matrix[i][1];
+      }
+
+      int* rightMatrix=malloc((numOfPro)*sizeof(int));
+      for (i = 1; i < numOfPro+1; ++i)
+      {
+        rightMatrix[i-1]= matrix[i][numOfPro];
+      }
+
+      MPI_Request newReqs[16];
+      MPI_Status newStats[16];
+
+      MPI_Isend(&upLeftNum, 1, MPI_INT, inbuf[UPLEFT], tag, MPI_COMM_WORLD, &newReqs[0]);
+      MPI_Isend(&upMatrix, numOfPro, MPI_INT, inbuf[UP], tag, MPI_COMM_WORLD, &newReqs[1]);
+      MPI_Isend(&upRightNum, 1, MPI_INT, inbuf[UPRIGHT], tag, MPI_COMM_WORLD, &newReqs[2]);
+      MPI_Isend(&leftMatrix, numOfPro, MPI_INT, inbuf[LEFT], tag, MPI_COMM_WORLD, &newReqs[3]);
+      MPI_Isend(&rightMatrix, numOfPro, MPI_INT, inbuf[RIGHT], tag, MPI_COMM_WORLD, &newReqs[4]);
+      MPI_Isend(&downLeftNum, 1, MPI_INT, inbuf[DOWNLEFT], tag, MPI_COMM_WORLD, &newReqs[5]);
+      MPI_Isend(&downMatrix, numOfPro, MPI_INT, inbuf[DOWN], tag, MPI_COMM_WORLD, &newReqs[6]);
+      MPI_Isend(&downRightNum, 1, MPI_INT, inbuf[DOWNRIGHT], tag, MPI_COMM_WORLD, &newReqs[7]);
+//------------------------------------------------------------------------------------------------//
+  
+      int recvupLeftNum;
+      int recvupRightNum;
+      int recvdownLeftNum;
+      int recvdownRightNum;
+      int* recvupMatrix=malloc((numOfPro)*sizeof(int));
+      int* recvdownMatrix=malloc((numOfPro)*sizeof(int));
+      int* recvleftMatrix=malloc((numOfPro)*sizeof(int));
+      int* recvrightMatrix=malloc((numOfPro)*sizeof(int));
+
+      MPI_Irecv(&recvdownRightNum, 1, MPI_INT, inbuf[DOWNRIGHT], tag, MPI_COMM_WORLD, &newReqs[8]);   
+      MPI_Irecv(&recvdownMatrix, numOfPro, MPI_INT, inbuf[DOWN], tag, MPI_COMM_WORLD, &newReqs[9]);
+      MPI_Irecv(&recvdownLeftNum, 1, MPI_INT, inbuf[DOWNLEFT], tag, MPI_COMM_WORLD, &newReqs[10]);
+      MPI_Irecv(&recvrightMatrix, numOfPro, MPI_INT, inbuf[RIGHT], tag, MPI_COMM_WORLD, &newReqs[11]);
+      MPI_Irecv(&recvleftMatrix, numOfPro, MPI_INT, inbuf[LEFT], tag, MPI_COMM_WORLD, &newReqs[12]);
+      MPI_Irecv(&recvupRightNum, 1, MPI_INT, inbuf[UPRIGHT], tag, MPI_COMM_WORLD, &newReqs[13]);
+      MPI_Irecv(&recvupMatrix, numOfPro, MPI_INT, inbuf[UP], tag, MPI_COMM_WORLD, &newReqs[14]);
+      MPI_Irecv(&recvupLeftNum, 1, MPI_INT, inbuf[UPLEFT], tag, MPI_COMM_WORLD, &newReqs[15]);
+
+//------------------------------------------------------------------------------------------------//
+      MPI_Waitall(16, newReqs, newStats);
+
+      //printf("###bbbbbbbbbbbb######\n" );
       sleep(2);
-      printf("Rank : %d\n",rank );
+      printf("Rank :::: %d\n",rank );
       for (i = 0; i < numOfPro+2; ++i)
       {
         for (j = 0; j < numOfPro+2; ++j)
@@ -147,6 +211,7 @@ void main(int argc, char *argv[])
         }
         printf("\n");
       }
+      printf("miamoyRank :::: %d\n",rank);
 
 
     }
