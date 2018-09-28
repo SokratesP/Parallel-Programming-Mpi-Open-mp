@@ -144,10 +144,10 @@ void main(int argc, char *argv[])
 
         if (i==0 || i==numOfPro+1 || j==0 || j == numOfPro+1 )
         {
-          matrix[i][j]= -4;
+          matrix[i][j]= 255;
         }
         else{
-          matrix[i][j]=rand() % 255;  
+          matrix[i][j]=rand() % 256;  
           //newMatrix[i-1][j-1] = 0;
         }
       }
@@ -385,13 +385,17 @@ void main(int argc, char *argv[])
 
           if (i==0 || i==numOfPro+1 || j==0 || j == numOfPro+1 )
           {
-            matrix[i][j]= -4;
+            matrix[i][j]= 255;
           }
           else{
             if(newMatrix[i-1][j-1]>=255)
             {
               matrix[i][j]=255;
-            }else
+            }else if (newMatrix[i-1][j-1]<=0)
+            {
+              matrix[i][j]=0;
+            }
+            else
             {
               matrix[i][j]=newMatrix[i-1][j-1];
             }  
@@ -429,7 +433,7 @@ void main(int argc, char *argv[])
 
     //printf("###bbbbbbbbbbbb######\n" );
     //sleep(2);
-    printf("Rank :::: %d s= %d\n",rank ,foundS);
+    printf("Rank :::: %d s= %d     foundS=%d \n",rank ,s ,foundS);
     for (i = 0; i < numOfPro+2; ++i)
     {
       for (j = 0; j < numOfPro+2; ++j)
